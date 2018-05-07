@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private GameObject spawnPoint;
     private float lateralDist;
     [HideInInspector] public bool pause = false; //controla el pausado
+    private GameLogic gameLogic;
 
 	// Use this for initialization
 	void Start () {
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour {
         distToGround = collider.bounds.extents.y + 0.1f;
         lateralDist = collider.bounds.extents.x;
         transform.position = spawnPoint.transform.position;
+        gameLogic = FindObjectOfType<GameLogic>();
 	}
 	
 	// Update is called once per frame
@@ -72,10 +74,22 @@ public class PlayerController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D c) {
         if (c.tag.Equals("Kill")) {
+            gameLogic.Restart();
             Restart();
         }
         else if (c.tag.Equals("Jump")) {
             Jump(speedUpForce);
+        }
+        else if (c.tag.Equals("Coin")) {
+            gameLogic.pointCounter += 20;
+            c.gameObject.SetActive(false);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D c) {
+        if (c.gameObject.tag.Equals("Box")) {
+            c.gameObject.GetComponent<BoxAnimation>().play = true;
+            gameLogic.pointCounter += 40;
         }
     }
 }
