@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float jumpForce = 5, speedUpForce = 5, speedX = 50;
     [SerializeField] private GameObject spawnPoint;
     private float lateralDist;
-    [HideInInspector] public bool stop = false; //controla el pausado
+    [HideInInspector] public bool pause = false; //controla el pausado
 
 	// Use this for initialization
 	void Start () {
@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (stop) {
+        if (pause) {
 
         }
         else {
