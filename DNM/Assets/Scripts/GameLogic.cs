@@ -9,7 +9,8 @@ public class GameLogic : MonoBehaviour {
     private bool pause = false;
     [SerializeField] private GameObject pauseCanvas;
     [SerializeField] private Text puntos;
-    public int pointCounter;
+    [HideInInspector]public int pointCounter;
+    public bool[] bigCoinGrabbed = { false, false, false };
     private float counter;
     [HideInInspector] public List<InteractableItem> interactableElements;
 
@@ -21,6 +22,7 @@ public class GameLogic : MonoBehaviour {
         pointCounter = 0;
         puntos.text = "Puntos: "+pointCounter;
         counter = 0.0f;
+        bigCoinGrabbed = new bool[3] { false, false, false }; ;
 	}
 	
 	// Update is called once per frame
@@ -46,6 +48,8 @@ public class GameLogic : MonoBehaviour {
 	}
 
     public void Restart() {
+        pointCounter = 0;
+        bigCoinGrabbed = new bool[3] { false, false, false };
         foreach(InteractableItem i in interactableElements) {
             i.Restart();
         }

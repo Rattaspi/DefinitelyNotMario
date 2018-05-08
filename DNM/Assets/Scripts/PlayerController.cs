@@ -10,16 +10,22 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private GameObject spawnPoint;
     private float lateralDist;
     [HideInInspector] public bool pause = false; //controla el pausado
-    private GameLogic gameLogic;
+    private GameLogic gamelogic;
 
-	// Use this for initialization
-	void Start () {
+    [Header("Points")]
+    [SerializeField] private int coinPoints = 20;
+    [SerializeField] private int boxPoints = 40;
+    [SerializeField] private int enemyPoints = 60;
+    [SerializeField] private int bigCoinPoints = 150;
+
+    // Use this for initialization
+    void Start () {
         rb = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         distToGround = collider.bounds.extents.y + 0.1f;
         lateralDist = collider.bounds.extents.x;
         transform.position = spawnPoint.transform.position;
-        gameLogic = FindObjectOfType<GameLogic>();
+        gamelogic = FindObjectOfType<GameLogic>();
 	}
 	
 	// Update is called once per frame
@@ -48,6 +54,7 @@ public class PlayerController : MonoBehaviour {
 
             //Comprovacion de colision frontal
             if (IsCollidingFront()) {
+                gamelogic.Restart();
                 Restart();
             }
         }
@@ -70,18 +77,24 @@ public class PlayerController : MonoBehaviour {
 
     private void Restart() {
         transform.position = spawnPoint.transform.position;
+        rb.velocity = Vector3.zero;
     }
 
     private void OnTriggerEnter2D(Collider2D c) {
         if (c.tag.Equals("Kill")) {
-            gameLogic.Restart();
+            gamelogic.Restart();
             Restart();
         }
         else if (c.tag.Equals("Jump")) {
             Jump(speedUpForce);
         }
         else if (c.tag.Equals("Coin")) {
-            gameLogic.pointCounter += 20;
+            gamelogic.pointCounter += coinPoints;
+            c.gameObject.SetActive(false);
+        }
+        else if (c.tag.Equals("Big_Coin")) {
+            gamelogic.bigCoinGrabbed[c.gameObject.GetComponent<BigCoin>().bigCoinID] = true;
+            gamelogic.pointCounter += bigCoinPoints;
             c.gameObject.SetActive(false);
         }
     }
@@ -89,7 +102,12 @@ public class PlayerController : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D c) {
         if (c.gameObject.tag.Equals("Box")) {
             c.gameObject.GetComponent<BoxAnimation>().play = true;
-            gameLogic.pointCounter += 40;
+            gamelogic.pointCounter += boxPoints;
+        }
+        else if (c.gameObject.tag.Equals("Enemy")) {
+            Jump(jumpForce);
+            c.gameObject.GetComponent<Enemy>().currentState = Enemy.STATE.DIE;
+            gamelogic.pointCounter += enemyPoints;
         }
     }
 }
