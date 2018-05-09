@@ -39,6 +39,13 @@ public class GameLogic : MonoBehaviour {
             }
         }
 
+        if (pause) {
+            Time.timeScale = 0.0f;
+        }
+        else {
+            Time.timeScale = 1.0f;
+        }
+
         if(counter > 0.3f) {
             pointCounter++;
             counter = 0;
