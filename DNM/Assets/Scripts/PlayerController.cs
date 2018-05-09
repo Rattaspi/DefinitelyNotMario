@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour {
     private float lateralDist;
     [HideInInspector] public bool pause = false; //controla el pausado
     private GameLogic gamelogic;
+    private bool jumping;
+    private float jumpTimer;
 
     [Header("Points")]
     [SerializeField] private int coinPoints = 20;
@@ -26,6 +28,8 @@ public class PlayerController : MonoBehaviour {
         lateralDist = collider.bounds.extents.x;
         transform.position = spawnPoint.transform.position;
         gamelogic = FindObjectOfType<GameLogic>();
+        jumping = false;
+        jumpTimer = 0.0f;
 	}
 	
 	// Update is called once per frame
@@ -52,8 +56,12 @@ public class PlayerController : MonoBehaviour {
                 rb.velocity = Vector3.zero;
             }
 
+            //checkeo de la tecla espacio para hacer saltos consecutivos
+            jumping = CheckJumpKey();
+            print(jumpTimer);
+
             //Salto
-            if (Input.GetKeyDown(KeyCode.Space) && IsGrounded()) {
+            if (jumping && IsGrounded()) {
                 Jump(jumpForce);
             }
 
@@ -65,6 +73,18 @@ public class PlayerController : MonoBehaviour {
             }
         }
 	}
+    
+    private bool CheckJumpKey() {
+        if (jumpTimer > 0.03) {
+            jumpTimer = 0.0f;
+            return Input.GetKey(KeyCode.Space);
+        }
+        else {
+            jumpTimer += Time.deltaTime;
+            return jumping;
+        }
+
+    }
 
     private void Jump(float f) {
         Vector2 v = rb.velocity;
