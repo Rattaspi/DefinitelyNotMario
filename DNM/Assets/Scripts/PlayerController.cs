@@ -47,13 +47,19 @@ public class PlayerController : MonoBehaviour {
                 rb.gravityScale = 4;
             }
 
+            //Control de aterrizaje a alta velocidad
+            if(IsGrounded() && rb.velocity.y < 0) {
+                rb.velocity = Vector3.zero;
+            }
+
             //Salto
             if (Input.GetKeyDown(KeyCode.Space) && IsGrounded()) {
                 Jump(jumpForce);
             }
 
             //Comprovacion de colision frontal
-            if (IsCollidingFront()) {
+            if (IsCollidingFront() && transform.position.y > -2) {
+                print("collided front");
                 gamelogic.Restart();
                 Restart();
             }
@@ -82,6 +88,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D c) {
         if (c.tag.Equals("Kill")) {
+            print("trigger kill");
             gamelogic.Restart();
             Restart();
         }

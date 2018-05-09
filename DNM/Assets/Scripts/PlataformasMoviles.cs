@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlataformasMoviles : InteractableItem {
     [SerializeField] private GameObject arriba, abajo;
-    [SerializeField] private float speed = 2;
+    [SerializeField] private float speed = 2, distance = 0.5f;
     private Vector3 initialPosArriba, initialPosAbajo;
     private GameLogic gamelogic;
     public enum PLATSTATE {IDLE, MOVE };
@@ -23,10 +23,10 @@ public class PlataformasMoviles : InteractableItem {
 	void Update () {
         AddToGamelogic(gamelogic, this);
         if (currentState == PLATSTATE.MOVE) {
-            if(abajo.transform.position.y > initialPosAbajo.y - 0.5f) {
+            if(abajo.transform.position.y > initialPosAbajo.y - distance) {
                 abajo.transform.position += new Vector3(0, -speed * Time.deltaTime, 0);
             }
-            if(arriba.transform.position.y < initialPosArriba.y + 0.5f) {
+            if(arriba.transform.position.y < initialPosArriba.y + distance) {
                 arriba.transform.position += new Vector3(0, speed * Time.deltaTime, 0);
             }
         }
