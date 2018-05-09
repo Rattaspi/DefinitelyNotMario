@@ -6,13 +6,14 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody2D rb;
     private float distToGround;
     private Collider2D collider;
-    [SerializeField] private float jumpForce = 5, speedUpForce = 5, speedX = 50;
+    public float jumpForce = 5, speedUpForce = 5, speedX = 50;
     [SerializeField] private GameObject spawnPoint;
     private float lateralDist;
     [HideInInspector] public bool pause = false; //controla el pausado
     private GameLogic gamelogic;
-    private bool jumping;
-    private float jumpTimer;
+    private bool jumping; //controla la orden de saltar
+    private float jumpTimer, initialSpeed;
+    private bool final; //controla el final de la partida
 
     [Header("Points")]
     [SerializeField] private int coinPoints = 20;
@@ -30,7 +31,9 @@ public class PlayerController : MonoBehaviour {
         gamelogic = FindObjectOfType<GameLogic>();
         jumping = false;
         jumpTimer = 0.0f;
-	}
+        final = false;
+        initialSpeed = speedX;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -43,34 +46,45 @@ public class PlayerController : MonoBehaviour {
             pos.x += speedX * Time.deltaTime;
             transform.position = pos;
 
-            //Control de gravedad en el salto.
-            if (rb.velocity.y < 0) {
-                rb.gravityScale = 10;
+            if (!final) {
+                //Control de gravedad en el salto.
+                if (rb.velocity.y < 0) {
+                    rb.gravityScale = 10;
+                }
+                else {
+                    rb.gravityScale = 4;
+                }
+
+                //Control de aterrizaje a alta velocidad
+                if (IsGrounded() && rb.velocity.y < 0) {
+                    rb.velocity = Vector3.zero;
+                }
+
+                //checkeo de la tecla espacio para hacer saltos consecutivos
+                jumping = CheckJumpKey();
+
+                //Salto
+                if (jumping && IsGrounded()) {
+                    Jump(jumpForce);
+                    gamelogic.saltosCounter++;
+                }
+
+                //Comprovacion de colision frontal
+                if (IsCollidingFront() && transform.position.y > -2) {
+                    gamelogic.Restart();
+                    Restart();
+                }
             }
-            else {
-                rb.gravityScale = 4;
+            else { //final
+                //deceleracion final
+                if (speedX > 0.5f) {
+                    speedX /= 1.03f;
+                }
+                else {
+                    speedX = 0;
+                }
             }
 
-            //Control de aterrizaje a alta velocidad
-            if(IsGrounded() && rb.velocity.y < 0) {
-                rb.velocity = Vector3.zero;
-            }
-
-            //checkeo de la tecla espacio para hacer saltos consecutivos
-            jumping = CheckJumpKey();
-            print(jumpTimer);
-
-            //Salto
-            if (jumping && IsGrounded()) {
-                Jump(jumpForce);
-            }
-
-            //Comprovacion de colision frontal
-            if (IsCollidingFront() && transform.position.y > -2) {
-                print("collided front");
-                gamelogic.Restart();
-                Restart();
-            }
         }
 	}
     
@@ -101,8 +115,10 @@ public class PlayerController : MonoBehaviour {
         return Physics2D.Raycast(transform.position, Vector2.right, distToGround - 0.2f);
     }
 
-    private void Restart() {
+    public void Restart() {
         transform.position = spawnPoint.transform.position;
+        final = false;
+        speedX = initialSpeed;
         rb.velocity = Vector3.zero;
     }
 
@@ -123,6 +139,9 @@ public class PlayerController : MonoBehaviour {
             gamelogic.bigCoinGrabbed[c.gameObject.GetComponent<BigCoin>().bigCoinID] = true;
             gamelogic.pointCounter += bigCoinPoints;
             c.gameObject.SetActive(false);
+        }
+        else if (c.tag.Equals("Final")) {
+            final = true;
         }
     }
 
