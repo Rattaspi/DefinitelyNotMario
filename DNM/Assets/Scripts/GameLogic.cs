@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameLogic : MonoBehaviour {
@@ -76,5 +77,9 @@ public class GameLogic : MonoBehaviour {
         foreach(InteractableItem i in interactableElements) {
             i.Restart();
         }
+    }
+
+    public void LoadScene(int id) {
+        SceneManager.LoadScene(id);
     }
 }
