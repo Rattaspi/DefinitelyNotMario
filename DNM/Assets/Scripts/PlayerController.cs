@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour {
 
                 //Comprovacion de colision frontal
                 if (!gamelogic.godMode) {
-                    if (IsCollidingFront() && transform.position.y > -2) {
+                    if (IsCollidingFront()) {
                         gamelogic.Restart();
                         Restart();
                     }

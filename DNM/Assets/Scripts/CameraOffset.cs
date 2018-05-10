@@ -16,7 +16,6 @@ public class CameraOffset : MonoBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D c) {
-        print(c.tag);
         if (c.tag.Equals("Player")) {
             ChangeCameraOffset();
         } 
