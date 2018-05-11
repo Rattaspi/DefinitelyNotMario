@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour {
     private bool jumping; //controla la orden de saltar
     private float jumpTimer, initialSpeed;
     private bool final; //controla el final de la partida
+    private SoundManager sm;
 
     [Header("Points")]
     [SerializeField] private int coinPoints = 20;
@@ -33,6 +34,7 @@ public class PlayerController : MonoBehaviour {
         jumpTimer = 0.0f;
         final = false;
         initialSpeed = speedX;
+        sm = FindObjectOfType<SoundManager>();
     }
 	
 	// Update is called once per frame
@@ -65,6 +67,7 @@ public class PlayerController : MonoBehaviour {
 
                 //Salto
                 if (jumping && IsGrounded()) {
+                    sm.PlaySound(SoundManager.SFX.JUMP);
                     Jump(jumpForce);
                     gamelogic.saltosCounter++;
                 }
@@ -72,6 +75,7 @@ public class PlayerController : MonoBehaviour {
                 //Comprovacion de colision frontal
                 if (!gamelogic.godMode) {
                     if (IsCollidingFront()) {
+                        sm.PlaySound(SoundManager.SFX.DEATH);
                         gamelogic.Restart();
                         Restart();
                     }
@@ -126,7 +130,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D c) {
         if (!gamelogic.godMode && c.tag.Equals("Kill")) {
-            print("trigger kill");
+            sm.PlaySound(SoundManager.SFX.DEATH);
             gamelogic.Restart();
             Restart();
         }
@@ -134,10 +138,12 @@ public class PlayerController : MonoBehaviour {
             Jump(speedUpForce);
         }
         else if (c.tag.Equals("Coin")) {
+            sm.PlaySound(SoundManager.SFX.COIN);
             gamelogic.pointCounter += coinPoints;
             c.gameObject.SetActive(false);
         }
         else if (c.tag.Equals("Big_Coin")) {
+            sm.PlaySound(SoundManager.SFX.STAR);
             gamelogic.bigCoinGrabbed[c.gameObject.GetComponent<BigCoin>().bigCoinID] = true;
             gamelogic.pointCounter += bigCoinPoints;
             c.gameObject.SetActive(false);
@@ -151,9 +157,11 @@ public class PlayerController : MonoBehaviour {
         if (c.gameObject.tag.Equals("Box")) {
             c.gameObject.GetComponent<BoxAnimation>().play = true;
             gamelogic.pointCounter += boxPoints;
+            sm.PlaySound(SoundManager.SFX.BOX);
         }
         else if (c.gameObject.tag.Equals("Enemy")) {
             Jump(jumpForce);
+            sm.PlaySound(SoundManager.SFX.MONSTER);
             c.gameObject.GetComponent<Enemy>().currentState = Enemy.STATE.DIE;
             gamelogic.pointCounter += enemyPoints;
         }
