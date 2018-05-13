@@ -43,6 +43,10 @@ public class PlayerController : MonoBehaviour {
 
         }
         else {
+            if(rb.velocity.y < -30) {
+                rb.velocity = new Vector2(rb.velocity.x, -30.0f);
+            }
+
             //Movimiento horizontal
             Vector3 pos = transform.position;
             pos.x += speedX * Time.deltaTime;
